@@ -22,7 +22,7 @@ export default function DashboardPage() {
 
   return (
     <div className="p-10">
-      <h1 className="text-2xl font-bold mb-4">환영합니다, {user.email}님!</h1>
+      <h1 className="text-2xl font-bold mb-4">환영합니다, {user}님!</h1>
     </div>
   );
 }
