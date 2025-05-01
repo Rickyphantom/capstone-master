@@ -4,20 +4,14 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")  // .env 파일에 MySQL 접속 주소 필요
+  url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  name      String?
-  createdAt DateTime @default(now())
-}
-odel Log {
-  id        Int      @id @default(autoincrement())
-  userId    Int?
-  action    String
-  detail    String?
-  createdAt DateTime @default(now())
+model cloud {
+  id       Int       @id @default(autoincrement())
+  ip       String?   @db.VarChar(45)
+  message  String?   @db.Text
+  filename String?   @db.VarChar(255)
+  log_time DateTime? @db.DateTime(0)
+  data     String?   @db.Text
 }

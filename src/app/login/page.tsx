@@ -2,62 +2,82 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import Link from 'next/link'; // ✅ 추가
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [pw, setPw] = useState('');
-  const [msg, setMsg] = useState('');
   const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const login = async () => {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password: pw }),
-    });
+  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
 
-    const data = await res.json();
-    if (res.ok) {
-      router.push('/dashboard'); // 로그인 성공 시 대시보드로 이동
-    } else {
-      setMsg(data.error);
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        router.push('/dashboard'); // 성공하면 dashboard로 이동
+      } else {
+        setError(data.error || '로그인 실패');
+      }
+    } catch (err) {
+      console.error('로그인 요청 에러:', err);
+      setError('서버 통신 오류가 발생했습니다.');
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#1E1E2F]">
-      <div className="bg-[#2A2A3C] p-8 rounded-xl shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold text-white mb-6 text-center">로그인</h2>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
+      <h1 className="text-3xl font-bold mb-8">로그인</h1>
 
+      <form
+        onSubmit={handleLogin}
+        className="flex flex-col gap-6 w-full max-w-md"
+      >
         <input
+          type="email"
           placeholder="이메일"
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full mb-4 p-3 rounded bg-[#3B3B50] text-white placeholder-gray-400"
+          required
+          className="border p-3 rounded text-gray-800"
         />
-
         <input
-          placeholder="비밀번호"
           type="password"
-          onChange={(e) => setPw(e.target.value)}
-          className="w-full mb-4 p-3 rounded bg-[#3B3B50] text-white placeholder-gray-400"
+          placeholder="비밀번호"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className="border p-3 rounded text-gray-800"
         />
+        {error && <p className="text-red-500 text-sm">{error}</p>}
 
         <button
-          onClick={login}
-          className="w-full bg-[#BCA7FF] text-black py-3 rounded hover:bg-[#d6c9ff] transition"
+          type="submit"
+          className="bg-blue-500 hover:bg-blue-600 text-white py-3 font-bold rounded transition"
         >
           로그인
         </button>
+      </form>
 
-        {msg && <p className="text-red-400 text-sm mt-4 text-center">{msg}</p>}
-
-        <div className="mt-6 text-center text-sm text-gray-400">
-          계정이 없으신가요?{" "}
-          <Link href="/signup" className="text-[#BCA7FF] hover:underline">
-            회원가입
-          </Link>
-        </div>
+      {/* ✅ 로그인 밑에 회원가입 버튼 추가 */}
+      <div className="mt-6 text-center">
+        <p className="text-gray-600 mb-2">아직 계정이 없으신가요?</p>
+        <Link
+          href="/signup" // ✅ 회원가입 페이지 경로
+          className="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition"
+        >
+          회원가입 하기
+        </Link>
       </div>
     </div>
   );

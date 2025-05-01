@@ -1,7 +1,15 @@
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 export async function POST() {
-  cookies().delete('session');
-  return NextResponse.json({ message: '로그아웃 완료' });
+  const response = NextResponse.redirect(
+    new URL('/login', process.env.NEXT_PUBLIC_BASE_URL)
+  );
+
+  // nickname 쿠키 삭제
+  response.cookies.set('nickname', '', {
+    path: '/',
+    maxAge: 0,
+  });
+
+  return response;
 }

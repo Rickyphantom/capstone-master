@@ -37,11 +37,12 @@ export default function RootLayout({
 
             {/* Main Content */}
             <main className="flex-1 overflow-y-auto p-10 bg-white relative text-[#1E2A38]">
-              {/* 로그인 버튼 (우측 상단) */}
-              <div className="absolute top-4 right-10">
+              {/* 우측 상단 고정 버튼 */}
+              <div className="absolute top-4 right-10 flex items-center gap-4">
+                {/* 무조건 로그인 버튼만 */}
                 <Link
                   href="/login"
-                  className="px-4 py-2 bg-[#2ECC71] text-white font-semibold rounded-lg hover:opacity-90 transition"
+                  className="px-4 py-2 bg-[#2ECC71] hover:bg-[#28b765] text-white font-semibold rounded-lg transition"
                 >
                   로그인
                 </Link>

@@ -1,115 +1,149 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 export default function SignupPage() {
-  const [email, setEmail] = useState('');
-  const [pw, setPw] = useState('');
-  const [pwCheck, setPwCheck] = useState('');
   const [name, setName] = useState('');
-  const [msg, setMsg] = useState('');
-  const [emailValid, setEmailValid] = useState(false);
-  const router = useRouter();
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordCheck, setPasswordCheck] = useState('');
+  const [message, setMessage] = useState('');
 
-  // ✅ 이메일 중복 확인 API 호출
-  const checkEmailDuplicate = async () => {
-    const res = await fetch(`/api/auth/check-email?email=${email}`);
-    const data = await res.json();
-    if (res.ok && data.available) {
-      setEmailValid(true);
-      setMsg('✅ 사용 가능한 이메일입니다.');
-    } else {
-      setEmailValid(false);
-      setMsg('❌ 이미 등록된 이메일입니다.');
-    }
-  };
+  const validatePassword = (password: string, email: string) => {
+    const hasMinLength = password.length >= 8;
+    const hasLetters = /[a-zA-Z]/.test(password);
+    const hasNumbers = /[0-9]/.test(password);
+    const hasSpecials = /[^a-zA-Z0-9]/.test(password);
+    const notSameAsEmail = password !== email;
 
-  const isPasswordValid = (pw: string) => {
     return (
-      pw.length >= 8 &&
-      /[a-zA-Z]/.test(pw) &&
-      /[0-9]/.test(pw) &&
-      /[^a-zA-Z0-9]/.test(pw)
+      hasMinLength && hasLetters && hasNumbers && hasSpecials && notSameAsEmail
     );
   };
 
-  const submit = async () => {
-    if (!emailValid) {
-      setMsg('이메일 중복 확인이 필요합니다.');
+  // 닉네임 중복확인 (임시)
+  const checkNameDuplicate = () => {
+    alert('닉네임 중복확인(임시)');
+  };
+
+  // 아이디 중복확인 (임시)
+  const checkUsernameDuplicate = () => {
+    alert('아이디 중복확인(임시)');
+  };
+
+  // 이메일 인증 (임시)
+  const verifyEmail = () => {
+    alert('이메일 인증확인(임시)');
+  };
+
+  const handleSignup = async () => {
+    if (password !== passwordCheck) {
+      setMessage('비밀번호가 일치하지 않습니다.');
       return;
     }
 
-    if (pw !== pwCheck) {
-      setMsg('비밀번호가 일치하지 않습니다.');
+    if (!validatePassword(password, email)) {
+      setMessage(
+        '비밀번호는 영어, 숫자, 특수문자를 포함한 8자 이상이며, 아이디(이메일)와 같을 수 없습니다.'
+      );
       return;
     }
 
     const res = await fetch('/api/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password: pw, name }),
+      body: JSON.stringify({ email, username, password, name }),
     });
 
     const data = await res.json();
-    if (res.ok) router.push('/login');
-    else setMsg(data.error);
+    if (res.ok) {
+      setMessage('회원가입 성공!');
+    } else {
+      setMessage(data.error || '회원가입 실패');
+    }
   };
 
   return (
-    <div className="p-10 max-w-md mx-auto">
-      <h2 className="text-xl font-bold mb-4">회원가입</h2>
+    <div className="p-8 max-w-md mx-auto">
+      <h2 className="text-2xl font-bold mb-6">회원가입</h2>
 
-      {/* 이름 */}
-      <input
-        placeholder="이름"
-        onChange={(e) => setName(e.target.value)}
-        className="block mb-2 border p-2 w-full"
-      />
-
-      {/* 이메일 + 중복확인 */}
+      {/* 닉네임 입력 + 중복확인 버튼 */}
       <div className="flex gap-2 mb-2">
         <input
-          placeholder="이메일"
-          onChange={(e) => {
-            setEmail(e.target.value);
-            setEmailValid(false); // 이메일 바꾸면 다시 체크해야 함
-          }}
-          className="border p-2 flex-1"
+          placeholder="닉네임"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="border p-2 flex-1 rounded"
         />
         <button
-          onClick={checkEmailDuplicate}
+          onClick={checkNameDuplicate}
           className="bg-gray-700 text-white px-3 rounded"
         >
           중복확인
         </button>
       </div>
 
-      {/* 비밀번호 */}
+      {/* 아이디 입력 + 중복확인 버튼 */}
+      <div className="flex gap-2 mb-2">
+        <input
+          placeholder="아이디"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="border p-2 flex-1 rounded"
+        />
+        <button
+          onClick={checkUsernameDuplicate}
+          className="bg-gray-700 text-white px-3 rounded"
+        >
+          중복확인
+        </button>
+      </div>
+
+      {/* 이메일 입력 + 인증 버튼 */}
+      <div className="flex gap-2 mb-2">
+        <input
+          placeholder="이메일"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="border p-2 flex-1 rounded"
+        />
+        <button
+          onClick={verifyEmail}
+          className="bg-gray-700 text-white px-3 rounded"
+        >
+          인증
+        </button>
+      </div>
+
+      {/* 비밀번호 입력 */}
       <input
+        type="password"
         placeholder="비밀번호"
-        type="password"
-        onChange={(e) => setPw(e.target.value)}
-        className="block mb-2 border p-2 w-full"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="border p-2 w-full mb-2 rounded"
       />
 
-      {/* 비밀번호 확인 */}
+      {/* 비밀번호 확인 입력 */}
       <input
-        placeholder="비밀번호 확인"
         type="password"
-        onChange={(e) => setPwCheck(e.target.value)}
-        className="block mb-4 border p-2 w-full"
+        placeholder="비밀번호 확인"
+        value={passwordCheck}
+        onChange={(e) => setPasswordCheck(e.target.value)}
+        className="border p-2 w-full mb-4 rounded"
       />
 
+      {/* 가입하기 버튼 */}
       <button
-        onClick={submit}
-        disabled={!isPasswordValid(pw) || pw !== pwCheck || !emailValid}
-        className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed w-full"
+        onClick={handleSignup}
+        className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded w-full"
       >
         가입하기
       </button>
 
-      {msg && <p className="mt-2 text-red-400 text-sm">{msg}</p>}
+      {/* 메시지 표시 */}
+      {message && <p className="mt-4 text-red-500">{message}</p>}
     </div>
   );
 }
