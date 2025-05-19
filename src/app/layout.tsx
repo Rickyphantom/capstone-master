@@ -20,8 +20,7 @@ export default function RootLayout({
               <nav className="flex flex-col gap-4 text-sm">
                 {[
                   { href: '/', label: '홈' },
-                  { href: '/dashboard', label: '대시보드' },
-                  { href: '/textlogbox', label: '텍스트보드방식' },
+                  { href: '/loglogbox', label: '로그' },
                   { href: '/settings', label: '설정' },
                 ].map(({ href, label }) => (
                   <Link
