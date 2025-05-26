@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import './globals.css';
-import { LanguageProvider } from './context/LanguageContext';
+import { LanguageProvider } from '../components/LanguageContext';
 
 export default function RootLayout({
   children,
@@ -20,7 +20,7 @@ export default function RootLayout({
               <nav className="flex flex-col gap-4 text-sm">
                 {[
                   { href: '/', label: '홈' },
-                  { href: '/loglogbox', label: '로그' },
+                  { href: '/logboard', label: '로그' },
                   { href: '/settings', label: '설정' },
                 ].map(({ href, label }) => (
                   <Link
