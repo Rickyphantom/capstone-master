@@ -1,6 +1,6 @@
-'use client';
-
-import { useEffect, useState } from 'react';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { redirect } from 'next/navigation';
 
 interface Log {
   id: number;
@@ -10,14 +10,21 @@ interface Log {
   createdAt: string;
 }
 
-export default function LogBoardPage() {
-  const [logs, setLogs] = useState<Log[]>([]);
+export default async function LogBoardPage() {
+  const session = await getServerSession(authOptions);
 
-  useEffect(() => {
-    fetch('/api/logs')
-      .then(res => res.json())
-      .then(data => setLogs(data));
-  }, []);
+  if (!session) {
+    redirect('/auth-redirect?message=need-login&target=/logboard');
+  }
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/logs`, {
+    cache: 'no-store',
+    headers: {
+      Cookie: '', // getServerSession을 썼으므로 자동으로 쿠키 포함됨 (Next.js 서버 실행 중일 경우)
+    },
+  });
+
+  const logs: Log[] = await res.json();
 
   return (
     <div className="p-10">
@@ -35,12 +42,17 @@ export default function LogBoardPage() {
           </thead>
           <tbody>
             {logs.map((log) => (
-              <tr key={log.id} className="border-b border-[#3B3B50] hover:bg-[#2a2a2a]">
+              <tr
+                key={log.id}
+                className="border-b border-[#3B3B50] hover:bg-[#2a2a2a]"
+              >
                 <td className="p-3">{log.id}</td>
                 <td className="p-3">{log.userId ?? '-'}</td>
                 <td className="p-3">{log.action}</td>
                 <td className="p-3">{log.detail}</td>
-                <td className="p-3">{new Date(log.createdAt).toLocaleString()}</td>
+                <td className="p-3">
+                  {new Date(log.createdAt).toLocaleString()}
+                </td>
               </tr>
             ))}
           </tbody>

@@ -1,29 +1,30 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
+import { createContext, useContext, useState, ReactNode } from 'react';
 
-export function DarkModeToggle() {
-  const [isDark, setIsDark] = useState(false)
+interface LanguageContextProps {
+  language: string;
+  setLanguage: (lang: string) => void;
+}
 
-  useEffect(() => {
-    const dark = localStorage.getItem('theme') === 'dark'
-    setIsDark(dark)
-    document.documentElement.classList.toggle('dark', dark)
-  }, [])
+const LanguageContext = createContext<LanguageContextProps | undefined>(
+  undefined
+);
 
-  const toggleTheme = () => {
-    const next = !isDark
-    setIsDark(next)
-    localStorage.setItem('theme', next ? 'dark' : 'light')
-    document.documentElement.classList.toggle('dark', next)
-  }
+export const LanguageProvider = ({ children }: { children: ReactNode }) => {
+  const [language, setLanguage] = useState('ko'); // 기본값 한국어
 
   return (
-    <button
-      onClick={toggleTheme}
-      className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded"
-    >
-      {isDark ? '라이트 모드' : '다크 모드'}
-    </button>
-  )
-}
+    <LanguageContext.Provider value={{ language, setLanguage }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+};
+
+export const useLanguage = () => {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
+};

@@ -12,11 +12,29 @@ interface Log {
 
 export default function Home() {
   const [logs, setLogs] = useState<Log[]>([]);
+  const [monthlyCount, setMonthlyCount] = useState(0);
 
   useEffect(() => {
     fetch('/api/logs')
       .then((res) => res.json())
-      .then((data) => setLogs(data));
+      .then((data: Log[]) => {
+        setLogs(data);
+
+        // 이번 달에 해당하는 로그만 필터링
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
+        const filtered = data.filter((log) => {
+          const logDate = new Date(log.createdAt);
+          return (
+            logDate.getMonth() === currentMonth &&
+            logDate.getFullYear() === currentYear
+          );
+        });
+
+        setMonthlyCount(filtered.length);
+      });
   }, []);
 
   return (
@@ -26,7 +44,7 @@ export default function Home() {
       <section className="bg-[#1E1E2F] border border-[#2E2E42] rounded-xl p-6 shadow-md max-w-5xl mx-auto">
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-white">
-            🦠 이번 달 랜섬웨어 침입 시도: {logs.length}건
+            🦠 이번 달 랜섬웨어 침입 시도: {monthlyCount}건
           </h3>
         </div>
 
