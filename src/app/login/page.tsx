@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link'; // ✅ 추가
+import Link from 'next/link';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -25,7 +25,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (res.ok) {
-        router.push('/dashboard'); // 성공하면 dashboard로 이동
+        router.push('/dashboard');
       } else {
         setError(data.error || '로그인 실패');
       }
@@ -36,12 +36,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold mb-8">로그인</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#F9FAFB] p-6">
+      <h1 className="text-3xl font-bold mb-8 text-[#1E2A38]">🔐 로그인</h1>
 
       <form
         onSubmit={handleLogin}
-        className="flex flex-col gap-6 w-full max-w-md"
+        className="flex flex-col gap-6 w-full max-w-md bg-white border border-[#CBD5E1] p-8 rounded-2xl shadow-card"
       >
         <input
           type="email"
@@ -49,7 +49,7 @@ export default function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="border p-3 rounded text-gray-800"
+          className="border border-[#CBD5E1] p-3 rounded-lg text-[#1E2A38] focus:outline-none focus:ring-2 focus:ring-[#4D90FE]"
         />
         <input
           type="password"
@@ -57,27 +57,35 @@ export default function LoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="border p-3 rounded text-gray-800"
+          className="border border-[#CBD5E1] p-3 rounded-lg text-[#1E2A38] focus:outline-none focus:ring-2 focus:ring-[#4D90FE]"
         />
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+        {error && <p className="text-red-600 text-sm font-medium">{error}</p>}
 
         <button
           type="submit"
-          className="bg-blue-500 hover:bg-blue-600 text-white py-3 font-bold rounded transition"
+          className="bg-[#4D90FE] hover:bg-[#3b7be0] text-white py-3 font-bold rounded-lg transition"
         >
           로그인
         </button>
       </form>
 
-      {/* ✅ 로그인 밑에 회원가입 버튼 추가 */}
       <div className="mt-6 text-center">
         <p className="text-gray-600 mb-2">아직 계정이 없으신가요?</p>
         <Link
-          href="/signup" // ✅ 회원가입 페이지 경로
-          className="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition"
+          href="/signup"
+          className="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition"
         >
           회원가입 하기
         </Link>
+        <button
+          onClick={() => {
+            alert('테스트용 우회 로그인 (DB 미연결 상태)');
+            window.location.href = '/dashboard?guest=true';
+          }}
+          className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition"
+        >
+          우회 로그인
+        </button>
       </div>
     </div>
   );
