@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
-import { prisma } from '@/lib/prisma'; // 네가 쓰는 prisma 인스턴스
+import { PrismaClient } from '@/generated/user'; // ✅ user_db용 Prisma Client
+
+const userPrisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
@@ -13,10 +15,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1. 이메일로 DB 조회
-    const user = await prisma.cloud.findFirst({
+    // 1. 이메일로 user_db의 cloud 테이블 조회
+    const user = await userPrisma.cloud.findFirst({
       where: {
-        ip: email, // cloud 테이블의 ip에 이메일 저장되어 있음
+        ip: email, // cloud 테이블의 ip 칼럼에 이메일 저장됨
       },
     });
 
@@ -38,7 +40,7 @@ export async function POST(req: Request) {
     }
 
     // 3. 닉네임 가져오기
-    const nickname = user.filename ?? '사용자'; // filename 컬럼에 닉네임이 저장되어 있다고 가정
+    const nickname = user.filename ?? '사용자';
 
     // 4. 쿠키에 닉네임 저장
     const response = NextResponse.json({
@@ -47,7 +49,7 @@ export async function POST(req: Request) {
 
     response.cookies.set('nickname', nickname, {
       path: '/',
-      httpOnly: false, // 클라이언트 측에서 읽을 수 있어야 하니까 false
+      httpOnly: false,
       sameSite: 'lax',
     });
 

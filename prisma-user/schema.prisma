@@ -1,0 +1,19 @@
+datasource db {
+  provider = "mysql"
+  url      = env("USERDB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/user"
+}
+
+// 예시: 로그인용 cloud 테이블
+model cloud {
+  id       Int       @id @default(autoincrement())
+  ip       String?   @db.VarChar(45)     // 이메일 저장
+  message  String?   @db.Text            // 비밀번호 해시
+  filename String?   @db.VarChar(255)    // 아이디 또는 닉네임 저장
+  log_time DateTime? @db.DateTime(0)
+  data     String?   @db.Text
+}

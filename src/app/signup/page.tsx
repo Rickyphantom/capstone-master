@@ -3,8 +3,7 @@
 import { useState } from 'react';
 
 export default function SignupPage() {
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
+  const [id, setId] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordCheck, setPasswordCheck] = useState('');
@@ -28,21 +27,9 @@ export default function SignupPage() {
     return true;
   };
 
-  const checkNameDuplicate = async () => {
+  const checkIdDuplicate = async () => {
     const res = await fetch(
-      '/api/auth/check-name?name=' + encodeURIComponent(name)
-    );
-    const data = await res.json();
-    if (data.exists) {
-      setMessage('이미 사용 중인 닉네임입니다.');
-    } else {
-      setMessage('사용 가능한 닉네임입니다.');
-    }
-  };
-
-  const checkUsernameDuplicate = async () => {
-    const res = await fetch(
-      '/api/auth/check-username?username=' + encodeURIComponent(username)
+      '/api/auth/signup?id=' + encodeURIComponent(id)
     );
     const data = await res.json();
     if (data.exists) {
@@ -54,7 +41,7 @@ export default function SignupPage() {
 
   const verifyEmail = async () => {
     const res = await fetch(
-      '/api/auth/check-email?email=' + encodeURIComponent(email)
+      '/api/auth/signup?email=' + encodeURIComponent(email)
     );
     const data = await res.json();
     if (data.exists) {
@@ -78,7 +65,7 @@ export default function SignupPage() {
     const res = await fetch('/api/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, username, password, name }),
+      body: JSON.stringify({ id, email, password }),
     });
 
     const data = await res.json();
@@ -95,28 +82,13 @@ export default function SignupPage() {
 
       <div className="flex gap-2 mb-4">
         <input
-          placeholder="닉네임"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="border border-[#CBD5E1] p-2 flex-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D90FE]"
-        />
-        <button
-          onClick={checkNameDuplicate}
-          className="bg-[#4D90FE] hover:bg-[#3b7be0] text-white px-4 rounded-lg"
-        >
-          중복확인
-        </button>
-      </div>
-
-      <div className="flex gap-2 mb-4">
-        <input
           placeholder="아이디"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="border border-[#CBD5E1] p-2 flex-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D90FE]"
+          value={id}
+          onChange={(e) => setId(e.target.value)}
+          className="placeholder-black text-black border border-[#CBD5E1] p-2 flex-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D90FE]"
         />
         <button
-          onClick={checkUsernameDuplicate}
+          onClick={checkIdDuplicate}
           className="bg-[#4D90FE] hover:bg-[#3b7be0] text-white px-4 rounded-lg"
         >
           중복확인
@@ -128,7 +100,7 @@ export default function SignupPage() {
           placeholder="이메일"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="border border-[#CBD5E1] p-2 flex-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D90FE]"
+          className="placeholder-black text-black border border-[#CBD5E1] p-2 flex-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D90FE]"
         />
         <button
           onClick={verifyEmail}
@@ -143,7 +115,7 @@ export default function SignupPage() {
         placeholder="비밀번호"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        className="border border-[#CBD5E1] p-2 w-full mb-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D90FE]"
+        className="placeholder-black text-black border border-[#CBD5E1] p-2 w-full mb-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D90FE]"
       />
       {passwordError && (
         <p className="text-red-600 text-sm font-medium mb-3">{passwordError}</p>
@@ -154,7 +126,7 @@ export default function SignupPage() {
         placeholder="비밀번호 확인"
         value={passwordCheck}
         onChange={(e) => setPasswordCheck(e.target.value)}
-        className="border border-[#CBD5E1] p-2 w-full mb-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D90FE]"
+        className="placeholder-black text-black border border-[#CBD5E1] p-2 w-full mb-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D90FE]"
       />
 
       <button
@@ -165,7 +137,7 @@ export default function SignupPage() {
       </button>
 
       {message && (
-        <p className="mt-4 text-red-600 font-medium text-sm">{message}</p>
+        <p className="mt-4 text-black font-medium text-sm">{message}</p>
       )}
     </div>
   );

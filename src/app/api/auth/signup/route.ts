@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
-import { prisma } from '@/lib/prisma';
+import { PrismaClient } from '@/generated/user';
 
-// 비밀번호 유효성 검사
+const userPrisma = new PrismaClient();
+
+// 비밀번호 유효성 검사 함수
 function isValidPassword(password: string) {
   const hasMinLength = password.length >= 8;
   const hasLetters = /[a-zA-Z]/.test(password);
@@ -11,12 +13,34 @@ function isValidPassword(password: string) {
   return hasMinLength && hasLetters && hasNumbers && hasSpecials;
 }
 
-// POST 요청 처리
+// 이메일과 아이디 중복확인 API
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const email = searchParams.get('email');
+  const id = searchParams.get('id');
+
+  if (email) {
+    const exists = await userPrisma.cloud.findFirst({ where: { ip: email } });
+    return NextResponse.json({ exists: !!exists });
+  }
+
+  if (id) {
+    const exists = await userPrisma.cloud.findFirst({ where: { filename: id } });
+    return NextResponse.json({ exists: !!exists });
+  }
+
+  return NextResponse.json(
+    { error: 'email 또는 id 쿼리를 제공해야 합니다.' },
+    { status: 400 }
+  );
+}
+
+// 회원가입 API
 export async function POST(req: Request) {
   try {
-    const { email, password, name } = await req.json();
+    const { email, password, id } = await req.json();
 
-    if (!email || !password || !name) {
+    if (!email || !password || !id) {
       return NextResponse.json(
         { error: '모든 항목을 입력해야 합니다.' },
         { status: 400 }
@@ -30,36 +54,24 @@ export async function POST(req: Request) {
       );
     }
 
-    // cloud 테이블에서 ip(email 저장한 곳)으로 기존 사용자 찾기
-    const existingUser = await prisma.cloud.findFirst({
-      where: {
-        ip: email,
-      },
-    });
-
-    if (existingUser) {
-      return NextResponse.json(
-        { error: '이미 등록된 이메일입니다.' },
-        { status: 400 }
-      );
-    }
-
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // cloud 테이블에 회원가입 정보 저장
-    await prisma.cloud.create({
+    await userPrisma.cloud.create({
       data: {
-        ip: email, // 이메일을 ip 칼럼에
-        message: hashedPassword, // 비밀번호(hash)를 message 칼럼에
-        filename: name, // 이름을 filename 칼럼에
-        log_time: new Date(), // 가입 시간 저장
-        data: null, // 필요 없으면 null
+        ip: email,
+        message: hashedPassword,
+        filename: id,
+        log_time: new Date(),
+        data: null,
       },
     });
 
     return NextResponse.json({ message: '회원가입 성공' });
   } catch (error) {
     console.error('회원가입 에러:', error);
-    return NextResponse.json({ error: '서버 내부 오류' }, { status: 500 });
+    return NextResponse.json(
+      { error: '서버 내부 오류' },
+      { status: 500 }
+    );
   }
 }

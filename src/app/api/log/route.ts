@@ -1,18 +1,17 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { PrismaClient } from '@/generated/log';  // set_db용 Prisma Client
+
+const logPrisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const logs = await prisma.cloud.findMany({
-      orderBy: {
-        log_time: 'desc',
-      },
-      take: 100,
+    const logs = await logPrisma.log.findMany({
+      orderBy: { createdAt: 'desc' },
     });
 
     return NextResponse.json(logs);
   } catch (error) {
-    console.error('[LOG_FETCH_ERROR]', error);
-    return NextResponse.json({ error: '로그 가져오기 실패' }, { status: 500 });
+    console.error('로그 조회 오류:', error);
+    return NextResponse.json({ error: '로그 조회 실패' }, { status: 500 });
   }
 }

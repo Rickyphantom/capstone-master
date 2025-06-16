@@ -77,15 +77,6 @@ export default function LoginPage() {
         >
           회원가입 하기
         </Link>
-        <button
-          onClick={() => {
-            alert('테스트용 우회 로그인 (DB 미연결 상태)');
-            window.location.href = '/dashboard?guest=true';
-          }}
-          className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition"
-        >
-          우회 로그인
-        </button>
       </div>
     </div>
   );

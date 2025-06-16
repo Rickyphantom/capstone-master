@@ -1,0 +1,25 @@
+datasource db {
+  provider = "mysql"
+  url      = env("SETDB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/log"
+}
+
+model cloud {
+  id       Int       @id @default(autoincrement())
+  ip       String?   @db.VarChar(45)
+  message  String?   @db.Text
+  filename String?   @db.VarChar(255)
+  log_time DateTime? @db.DateTime(0)
+  data     String?   @db.Text
+}
+
+model log {
+  id        Int      @id @default(autoincrement())
+  action    String
+  createdAt DateTime @default(now())
+  message   String?
+}

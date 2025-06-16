@@ -7,8 +7,11 @@ RUN npm install
 
 COPY . .
 
-# 📌 prisma generate를 빌드 직전에 한 번 더
-RUN npx prisma generate --schema=./prisma/schema.prisma
+COPY .env .env
+
+# 각각 스키마를 지정해서 prisma generate 실행
+RUN npx prisma generate --schema=./prisma-user/schema.prisma
+RUN npx prisma generate --schema=./prisma-log/schema.prisma
 
 RUN npm run build
 
